@@ -1,0 +1,227 @@
+{
+  "createdAt": "2025-07-27T02:34:37.240Z",
+  "updatedAt": "2025-07-28T21:19:44.000Z",
+  "id": "HSEm2hiJosmG1bA4",
+  "name": "Save Negotiations to disk-Individual Test",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -496,
+        -240
+      ],
+      "id": "db56363d-02c6-4392-9329-09392c2f9cea",
+      "name": "When chat message received",
+      "webhookId": "f40f18b0-1c45-4827-aa7b-0f3868a950d1"
+    },
+    {
+      "parameters": {
+        "url": "https://www.blackswanltd.com/newsletter/3-insider-keys-to-how-to-spot-a-liar",
+        "options": {
+          "allowUnauthorizedCerts": true,
+          "response": {
+            "response": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -272,
+        -240
+      ],
+      "id": "e388904a-0536-4a13-a3b8-ab69023be6e9",
+      "name": "Fetch Topic"
+    },
+    {
+      "parameters": {
+        "html": "={{ $json.plainText }}",
+        "destinationKey": "markdown_text",
+        "options": {
+          "useLinkReferenceDefinitions": false
+        }
+      },
+      "type": "n8n-nodes-base.markdown",
+      "typeVersion": 1,
+      "position": [
+        -272,
+        -16
+      ],
+      "id": "908a4bb2-18aa-4d86-990a-7e9a437c6d9c",
+      "name": "Markdown"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// n8n Code node — removes HTML tags (including img, script, style, audio, svg), social media links, and tracking from $input.first().json.data\n\nconst html = $json.data || \"\";\n\n// Use regex to extract <title> content\nconst titleMatch = html.match(/<title[^>]*>([^<]*)<\\/title>/i);\nconst title = titleMatch ? titleMatch[1].trim() : null;\n\n// Extract content inside <div id=\"post-body\">...</div>\nconst postBodyMatch = html.match(/<div[^>]*id=[\"']post-body[\"'][^>]*>([\\s\\S]*?)<\\/div>/i);\nconst postBody = postBodyMatch ? postBodyMatch[1].trim() : '';\n\nconsole.log(postBody);\n\n// Remove specific tags and their content (script, style, audio, svg)\nlet cleanHtml = postBody\n  .replace(/<head[^>]*>[\\s\\S]*?<\\/head>/gi, '')\n  .replace(/<script[^>]*>[\\s\\S]*?<\\/script>/gi, '')\n  .replace(/<noscript[^>]*>[\\s\\S]*?<\\/noscript>/gi, '')\n  .replace(/<style[^>]*>[\\s\\S]*?<\\/style>/gi, '')\n  .replace(/<header[^>]*>[\\s\\S]*?<\\/header>/gi, '')\n  .replace(/<footer[^>]*>[\\s\\S]*?<\\/footer>/gi, '')\n  .replace(/<!--[\\s\\S]*?-->/g, '')\n  .replace(/<audio[^>]*>[\\s\\S]*?<\\/audio>/gi, '')\n  .replace(/<svg[^>]*>[\\s\\S]*?<\\/svg>/gi, '');\n\n// Remove social media links (e.g., facebook, twitter, instagram, linkedin, youtube)\ncleanHtml = cleanHtml.replace(/<a[^>]+href=[\"']?[^\"'>]*?(facebook|twitter|instagram|linkedin|youtube)\\.com[^\"'>]*[\"']?[^>]*>[\\s\\S]*?<\\/a>/gi, '');\n\n// Remove known tracking parameters (e.g., utm_*, fbclid, gclid) from all URLs\ncleanHtml = cleanHtml.replace(/([?&](utm_[^=]+|fbclid|gclid)=[^&\\s#\"]*)/gi, '');\n\n// Remove image tags\ncleanHtml = cleanHtml.replace(/<img[^>]*>/gi, ''); // Remove img tags (self-closing)\n\n// Strip remaining HTML tags\nconst plainText = cleanHtml\n  .replace(/<[^>]*>/g, '')     // Remove any other tags\n  .replace(/\\s+/g, ' ')        // Collapse whitespace\n  .trim();                     // Trim leading/trailing space\n\nreturn {\n  json: {\n    title: title,\n    content: plainText\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -496,
+        -16
+      ],
+      "id": "62af8d32-e994-4879-ab81-2a1966c322c8",
+      "name": "Extract Content"
+    },
+    {
+      "parameters": {
+        "operation": "extractHtmlContent",
+        "extractionValues": {
+          "values": [
+            {
+              "key": "Title",
+              "cssSelector": "title"
+            },
+            {
+              "key": "Content",
+              "cssSelector": "#hs_cos_wrapper_post_body",
+              "skipSelectors": "img,a,nav"
+            }
+          ]
+        },
+        "options": {
+          "trimValues": true
+        }
+      },
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        -48,
+        -240
+      ],
+      "id": "86d053ca-cdb1-4be9-9c4b-bfcb4415b0d9",
+      "name": "HTML"
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "=D:\\\\Emory\\\\AI Automation\\\\Negotiations Content\\\\{{ $binary.data.fileName }}.{{ $binary.data.fileExtension }}",
+        "options": {
+          "append": false
+        }
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        624,
+        -240
+      ],
+      "id": "209e2b66-1b7a-4990-bd36-05bcd2ec5e18",
+      "name": "Read/Write Files from Disk"
+    },
+    {
+      "parameters": {
+        "operation": "toJson",
+        "options": {
+          "format": true,
+          "fileName": "={{ $json.CleanTitle }}"
+        }
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        400,
+        -240
+      ],
+      "id": "dc7bbe2b-e89f-4c7c-b40c-1c1d3830133f",
+      "name": "Convert to File"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the Title from the first input item\nlet title = $input.first().json.Title || \"\";\n\n// Remove all special characters (keep letters, numbers, and spaces)\ntitle = title.replace(/[^a-zA-Z0-9 ]/g, \"\");\n\n// Return the modified title\nreturn {\n  json: {\n    CleanTitle: title,\n    content: $input.first().json.Content\n  }\n};\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        176,
+        -240
+      ],
+      "id": "3590461f-4761-4ff4-a3b6-8a9ebd60003c",
+      "name": "Code"
+    }
+  ],
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Fetch Topic",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Content": {
+      "main": [
+        [
+          {
+            "node": "Markdown",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Topic": {
+      "main": [
+        [
+          {
+            "node": "HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTML": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "Read/Write Files from Disk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "f393104d-2218-4347-b2ae-981583c593d7",
+  "triggerCount": 0,
+  "tags": []
+}
