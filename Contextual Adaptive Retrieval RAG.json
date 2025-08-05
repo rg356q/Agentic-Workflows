@@ -1,0 +1,192 @@
+{
+  "createdAt": "2025-08-04T15:17:52.878Z",
+  "updatedAt": "2025-08-04T15:51:11.000Z",
+  "id": "gPZ3tsjoHIVcTOzE",
+  "name": "Contextual Adaptive Retrieval RAG",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "content": "# Tool to Add Files to Vector DB with Contextual Embeddings using LOCAL\n## https://community.n8n.io/t/contextual-adaptive-retrieval-a-high-dimensional-embeddings-adaptive-n8n-rag-experiment/129647",
+        "height": 1168,
+        "width": 2512,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -272,
+        -80
+      ],
+      "typeVersion": 1,
+      "id": "1360603b-67cc-4fc7-811c-b17a93da64ce",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -64,
+        232
+      ],
+      "id": "40175bd0-dd70-42fd-8488-49dc9ce86043",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "fileSelector": "=D:\\\\Emory\\\\AI Automation\\\\Negotiations Content\\\\bulk\\\\*.json",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        160,
+        232
+      ],
+      "id": "ae1f45f4-ea07-4b8e-9499-81cf9b116ba0",
+      "name": "Read/Write Files from Disk"
+    },
+    {
+      "parameters": {
+        "options": {
+          "reset": false
+        }
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        384,
+        232
+      ],
+      "id": "881a4811-97b2-441e-a31a-8f2d4aec30ee",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "operation": "fromJson",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        608,
+        160
+      ],
+      "id": "dd3b07c4-39cf-4925-b06d-6e124bc3ed2b",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "58a83abe-9026-4318-911f-75a96d122432",
+              "leftValue": "={{ $json.data[0].content }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "55469e20-f0ba-4960-b340-4fce4c588caf",
+              "leftValue": "={{ $json.data[0].content }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        832,
+        232
+      ],
+      "id": "8b7b2d83-4ebc-4129-8b51-19d2cf003e89",
+      "name": "Check if content exists"
+    }
+  ],
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Read/Write Files from Disk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read/Write Files from Disk": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Check if content exists",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check if content exists": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "012fe361-fdd4-4547-b4df-99b57cd85b15",
+  "triggerCount": 0,
+  "tags": []
+}

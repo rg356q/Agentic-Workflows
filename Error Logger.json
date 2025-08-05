@@ -1,0 +1,31 @@
+{
+  "createdAt": "2025-07-31T01:10:11.653Z",
+  "updatedAt": "2025-08-01T22:32:50.000Z",
+  "id": "bWh4ByaH17bDbbPx",
+  "name": "Error Logger",
+  "active": false,
+  "isArchived": true,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        -256,
+        -128
+      ],
+      "id": "72ca5494-8c6b-441d-912f-9b4e68360a6e",
+      "name": "Error Trigger"
+    }
+  ],
+  "connections": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "aa7db7b3-e1b1-427f-b949-e1d294d4de08",
+  "triggerCount": 0,
+  "tags": []
+}
